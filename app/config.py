@@ -11,7 +11,7 @@ APP_PASSWORD = os.getenv("APP_PASSWORD", "").strip()
 
 ASSISTANT_NAME = os.getenv("ASSISTANT_NAME", "QBOLICK").strip() or "QBOLICK"
 LLM_MODEL = os.getenv("LLM_MODEL", "openai/gpt-oss-20b")
-STT_MODEL = os.getenv("STT_MODEL", "gpt-4o-mini-transcribe")
+STT_MODEL = os.getenv("STT_MODEL", "whisper-large-v3-turbo")
 TTS_MODEL = os.getenv("TTS_MODEL", "gpt-4o-mini-tts")
 TTS_VOICE = os.getenv("TTS_VOICE", "alloy")
 
