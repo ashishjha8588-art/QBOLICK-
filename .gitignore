@@ -1,0 +1,13 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+
+# Android/Gradle generated files
+.gradle/
+**/.gradle/
+build/
+**/build/
+local.properties
+server.log

@@ -1,0 +1,159 @@
+[32mcargo-binstall[0m/stable 1.20.1 aarch64
+  Tool to fetch and install precompiled musl-based static binaries from the Rust ecosystem
+
+[32mcargo-leptos[0m/stable 0.3.6 aarch64
+  Build tool for the Rust framework Leptos
+
+[32mcavif[0m/stable 1.6.0 aarch64
+  AVIF image creator in pure Rust
+
+[32mcorrosion[0m/stable 0.6.1 all
+  Tool for integrating Rust into an existing CMake project
+
+[32mdust[0m/stable 1.2.4 aarch64
+  A more intuitive version of du in rust
+
+[32memmylua-ls[0m/stable 0.23.2 aarch64
+  Emmy Lua Language Server coded in Rust
+
+[32mferoxbuster[0m/stable 2.13.1 aarch64
+  A fast, simple, recursive content discovery tool written in Rust
+
+[32mfindomain[0m/stable 10.0.1-1 aarch64
+  Findomain is the fastest subdomain enumerator and the only one written in Rust
+
+[32mgitoxide[0m/stable 0.55.0 aarch64
+  Rust implementation of Git
+
+[32mgitui[0m/stable 0.28.1 aarch64
+  Blazing fast terminal-ui for git written in rust
+
+[32mgobang[0m/stable 0.1.0-alpha.5-4 aarch64
+  A cross-platform TUI database management tool written in Rust
+
+[32mhelix[0m/stable 25.07.1-2 aarch64
+  A post-modern modal text editor written in rust
+
+[32mhors[0m/stable 0.8.2-3 aarch64
+  Instant coding answers via the command line (howdoi in rust)
+
+[32mkibi[0m/stable 0.3.3-1 aarch64
+  A tiny terminal text editor, written in Rust
+
+[32mlibrusty-v8[0m/stable 1:2.8.3 aarch64
+  High quality Rust bindings to V8's C++ API
+
+[32mlibtpms[0m/stable 0.10.2 aarch64
+  Provides software emulation of a Trusted Platform Module (TPM 1.2 and TPM 2.0)
+
+[32mlychee[0m/stable 0.24.2 aarch64
+  A fast, async, resource-friendly link checker written in Rust
+
+[32mmagic-wormhole-rs[0m/stable 0.7.6-1 aarch64
+  Rust implementation of Magic Wormhole, with new features and enhancements
+
+[32mmesa-opencl-icd-rusticl[0m/stable 26.0.6-1 aarch64
+  Mesa's Rusticl OpenCL ICD
+
+[32mncspot[0m/stable 1.3.4 aarch64
+  An ncurses Spotify client written in Rust
+
+[32monefetch[0m/stable 2.27.1 aarch64
+  A command-line Git information tool written in Rust
+
+[32mpython-ruff[0m/stable 0.15.19 aarch64
+  An extremely fast Python linter, written in Rust (Python bindings)
+
+[32mrnr[0m/stable 0.5.1 aarch64
+  Batch rename files and directories using regular expression (rust)
+
+[32mruff[0m/stable 0.15.19 aarch64
+  An extremely fast Python linter, written in Rust
+
+[32mrust[0m/stable 1.96.0 aarch64
+  Systems programming language focused on safety, speed and concurrency
+
+[32mrust-analyzer[0m/stable 20260622 aarch64
+  A Rust compiler front-end for IDEs
+
+[32mrust-bindgen[0m/stable 0.72.1 aarch64
+  Automatically generates Rust FFI bindings to C (and some C++) libraries
+
+[32mrust-docs[0m/stable 1.96.0 all
+  Rust documentation
+
+[32mrust-src[0m/stable 1.96.0 all
+  Rust source code files
+
+[32mrust-std-aarch64-linux-android[0m/stable 1.96.0 aarch64
+  Component files for target aarch64-linux-android
+
+[32mrust-std-armv7-linux-androideabi[0m/stable 1.96.0 aarch64
+  Component files for target armv7-linux-androideabi
+
+[32mrust-std-i686-linux-android[0m/stable 1.96.0 aarch64
+  Component files for target i686-linux-android
+
+[32mrust-std-wasm32-unknown-unknown[0m/stable 1.96.0 all
+  Component files for target wasm32-unknown-unknown
+
+[32mrust-std-wasm32-wasip1[0m/stable 1.96.0 all
+  Component files for target wasm32-wasip1
+
+[32mrust-std-wasm32-wasip2[0m/stable 1.96.0 all
+  Component files for target wasm32-wasip2
+
+[32mrust-std-wasm32-wasip3[0m/stable 1.96.0 all
+  Component files for target wasm32-wasip3
+
+[32mrust-std-wasm32v1-none[0m/stable 1.96.0 all
+  Component files for target wasm32v1-none
+
+[32mrust-std-x86-64-linux-android[0m/stable 1.96.0 aarch64
+  Component files for target x86_64-linux-android
+
+[32mrustc-dev[0m/stable 1.96.0 aarch64
+  Rust compiler development libs
+
+[32mrustc-src[0m/stable 1.96.0 all
+  Rust compiler source code files
+
+[32mrustscan[0m/stable 2.4.1-1 aarch64
+  The modern,fast,smart and effective port scanner
+
+[32msilicon[0m/stable 0.5.3-1 aarch64
+  Silicon is an alternative to Carbon implemented in Rust
+
+[32mtealdeer[0m/stable 1.8.1 aarch64
+  A very fast implementation of tldr in Rust
+
+[32mtere[0m/stable 1.6.0-1 aarch64
+  Terminal file explorer written in rust
+
+[32mtree-sitter-rust[0m/stable 0.24.2-1 aarch64
+  Rust grammar for tree-sitter
+
+[32mtrunk[0m/stable 0.21.14-1 aarch64
+  Build, bundle & ship your Rust WASM application to the web
+
+[32mtur-repo[0m/stable 1.0.1-1 all
+  A single and trusted place for all unofficial/less popular termux packages
+
+[32mturbopack[0m/stable 16.2.5 aarch64
+  Rust-based incremental compilation engine and bundler for Next.js
+
+[32mty[0m/stable 0.0.52 aarch64
+  An extremely fast Python type checker and language server, written in Rust
+
+[32muv[0m/stable 0.11.24 aarch64
+  An extremely fast Python package installer and resolver, written in Rust.
+
+[32mvirustotal-cli[0m/stable 1.3.1 aarch64
+  Command line interface for VirusTotal
+
+[32mweechat-matrix-rs[0m/stable 2022.10.04-2 aarch64
+  Rust rewrite of the python weechat-matrix script
+
+[32myazi[0m/stable 26.5.6 aarch64
+  Blazing fast terminal file manager written in Rust, based on async I/O
+

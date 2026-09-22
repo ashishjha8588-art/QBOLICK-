@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Voice Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0b1622;
+    --panel: #112232;
+    --line: #24425a;
+    --text: #e6f1f8;
+    --muted: #8aa4b8;
+    --ice: #7fd6ff;
+    --amber: #ffb84d;
+    --mint: #8ff0c4;
+    --alert: #ff8080;
+    --level: 0;
+    --display: "Rajdhani", "Segoe UI", system-ui, sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--ink);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+    padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 0);
+  }
+  header {
+    display: flex; align-items: baseline; justify-content: space-between;
+    padding: 16px 20px 0; max-width: 720px; width: 100%; margin: 0 auto;
+  }
+  h1 { font-family: var(--display); font-weight: 700; font-size: 28px; letter-spacing: .04em; margin: 0; }
+  .link-btn {
+    background: none; border: 0; color: var(--muted); font: inherit; font-size: 14px;
+    cursor: pointer; padding: 6px 0; text-decoration: underline; text-underline-offset: 3px;
+  }
+  .link-btn:hover { color: var(--text); }
+
+  main { flex: 1; min-height: 0; display: flex; flex-direction: column; max-width: 720px; width: 100%; margin: 0 auto; }
+
+  .stage { display: flex; flex-direction: column; align-items: center; padding: 28px 20px 12px; }
+  .orb {
+    --c: var(--ice);
+    width: 156px; height: 156px; border-radius: 50%;
+    border: 2px solid var(--c);
+    background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--c) 22%, transparent), transparent 70%), var(--panel);
+    color: var(--c);
+    display: grid; place-items: center; cursor: pointer;
+    box-shadow:
+      0 0 0 calc(6px + var(--level) * 26px) color-mix(in srgb, var(--c) 16%, transparent),
+      0 0 0 calc(14px + var(--level) * 52px) color-mix(in srgb, var(--c) 8%, transparent);
+    transition: border-color .25s, color .25s, box-shadow .08s linear;
+  }
+  .orb:focus-visible { outline: 3px solid var(--text); outline-offset: 6px; }
+  .orb svg { width: 52px; height: 52px; }
+  body[data-mode="listening"] .orb { --c: var(--amber); }
+  body[data-mode="thinking"] .orb { --c: var(--ice); animation: think 1.2s ease-in-out infinite; }
+  body[data-mode="speaking"] .orb { --c: var(--mint); animation: talk 1.1s ease-in-out infinite; }
+  body[data-mode="error"] .orb { --c: var(--alert); }
+  @keyframes think { 50% { transform: scale(.94); } }
+  @keyframes talk { 50% { box-shadow: 0 0 0 16px color-mix(in srgb, var(--c) 18%, transparent), 0 0 0 34px color-mix(in srgb, var(--c) 8%, transparent); } }
+  @media (prefers-reduced-motion: reduce) {
+    body[data-mode] .orb { animation: none; }
+  }
+  .status { margin: 34px 0 0; min-height: 24px; color: var(--muted); text-align: center; font-size: 15px; }
+  body[data-mode="error"] .status { color: var(--alert); }
+
+  .timers { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 6px 20px 0; min-height: 8px; }
+  .timer { border: 1px solid var(--line); border-radius: 999px; padding: 3px 12px; font-size: 14px; font-variant-numeric: tabular-nums; }
+
+  .log { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 20px 12px; }
+  .log:empty::before {
+    content: "Tap the circle and speak, or type below. Try: \201CWhat's the weather?\201D or \201CTurn on the desk light.\201D";
+    display: block; color: var(--muted); text-align: center; padding-top: 12px; max-width: 46ch; margin: 0 auto;
+  }
+  .msg { margin: 0 0 14px; max-width: 62ch; overflow-wrap: anywhere; }
+  .msg .who { display: block; font-size: 13px; color: var(--muted); margin-bottom: 1px; }
+  .msg.user { margin-left: auto; text-align: right; }
+  .msg.bot { border-left: 3px solid var(--ice); padding-left: 12px; }
+  .msg.note { color: var(--muted); font-size: 14px; }
+
+  form.bar { display: flex; gap: 8px; padding: 10px 20px 16px; border-top: 1px solid var(--line); }
+  input[type="text"], input[type="password"] {
+    flex: 1; background: var(--panel); border: 1px solid var(--line); color: var(--text);
+    border-radius: 10px; padding: 12px 14px; font: inherit; min-width: 0;
+  }
+  input:focus-visible, button:focus-visible { outline: 2px solid var(--ice); outline-offset: 2px; }
+  .btn {
+    background: var(--ice); color: var(--ink); border: 0; border-radius: 10px; padding: 0 18px;
+    font-family: var(--display); font-weight: 700; font-size: 17px; cursor: pointer;
+  }
+  .btn:disabled { opacity: .5; cursor: default; }
+
+  dialog {
+    background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 14px;
+    padding: 22px; width: min(92vw, 380px);
+  }
+  dialog::backdrop { background: rgba(4, 10, 16, .75); }
+  dialog h2 { margin: 0 0 6px; font-family: var(--display); font-size: 22px; }
+  dialog p { margin: 0 0 14px; color: var(--muted); font-size: 14px; }
+  dialog .row { display: flex; gap: 8px; }
+  .err { color: var(--alert); font-size: 14px; min-height: 20px; margin: 8px 0 0; }
+</style>
+</head>
+<body data-mode="idle">
+<header>
+  <h1 id="name">Jarvis</h1>
+  <button class="link-btn" id="reset" type="button">Clear conversation</button>
+</header>
+
+<main>
+  <section class="stage">
+    <button class="orb" id="orb" type="button" aria-label="Start listening">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="9" y="3" width="6" height="11" rx="3"></rect>
+        <path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path>
+      </svg>
+    </button>
+    <p class="status" id="status" role="status" aria-live="polite">Tap the circle to talk</p>
+  </section>
+  <div class="timers" id="timers" aria-label="Active timers"></div>
+  <div class="log" id="log" aria-live="polite"></div>
+  <form class="bar" id="textForm" autocomplete="off">
+    <input type="text" id="textInput" placeholder="Type a message" aria-label="Type a message" maxlength="2000">
+    <button class="btn" id="sendBtn" type="submit">Send</button>
+  </form>
+</main>
+
+<dialog id="lock">
+  <form method="dialog" id="lockForm">
+    <h2>Enter access code</h2>
+    <p>This assistant is protected. Ask the owner for the code.</p>
+    <div class="row">
+      <input type="password" id="codeInput" placeholder="Access code" aria-label="Access code" autocomplete="current-password">
+      <button class="btn" type="submit">Unlock</button>
+    </div>
+    <p class="err" id="lockErr"></p>
+  </form>
+</dialog>
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const orb = $('#orb'), statusEl = $('#status'), logEl = $('#log'), timersEl = $('#timers');
+  const lockDlg = $('#lock');
+
+  const uid = () => (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2) + Date.now());
+  const store = {
+    get(k) { try { return localStorage.getItem(k) || ''; } catch { return ''; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch { /* ignore */ } },
+  };
+  let sessionId = store.get('assistant_sid') || uid();
+  store.set('assistant_sid', sessionId);
+  let accessCode = store.get('assistant_code');
+  let assistantName = 'Jarvis';
+
+  const S = { recording: false, busy: false, continuous: false, rec: null, chunks: [], stream: null,
+              ctx: null, analyser: null, raf: 0, audio: null, heard: false };
+
+  function setMode(mode, text) {
+    document.body.dataset.mode = mode;
+    if (text !== undefined) statusEl.textContent = text;
+    orb.setAttribute('aria-label', mode === 'listening' ? 'Stop listening' : mode === 'speaking' ? 'Stop speaking' : 'Start listening');
+  }
+  const idle = () => { S.busy = false; setMode('idle', 'Tap the circle to talk'); orb.style.setProperty('--level', 0); };
+  const fail = (msg) => { S.busy = false; setMode('error', msg); };
+
+  function addMsg(kind, text) {
+    const el = document.createElement('p');
+    el.className = 'msg ' + kind;
+    if (kind !== 'note') {
+      const who = document.createElement('span');
+      who.className = 'who';
+      who.textContent = kind === 'user' ? 'You' : assistantName;
+      el.appendChild(who);
+    }
+    el.appendChild(document.createTextNode(text));
+    logEl.appendChild(el);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  // ---------- server calls ----------
+  async function api(path, opts = {}) {
+    const res = await fetch(path, { ...opts, headers: { ...(opts.headers || {}), 'X-Access-Code': accessCode } });
+    if (res.status === 401) { showLock(); throw new Error('Access code needed.'); }
+    if (!res.ok) {
+      let msg = 'Server error (' + res.status + ').';
+      try { msg = (await res.json()).detail || msg; } catch { /* ignore */ }
+      throw new Error(msg);
+    }
+    return res.json();
+  }
+
+  function showLock(error) {
+    $('#lockErr').textContent = error || '';
+    if (!lockDlg.open) lockDlg.showModal();
+    $('#codeInput').focus();
+  }
+  $('#lockForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    accessCode = $('#codeInput').value.trim();
+    try {
+      const res = await fetch('/api/check', { headers: { 'X-Access-Code': accessCode } });
+      if (!res.ok) throw new Error();
+      store.set('assistant_code', accessCode);
+      lockDlg.close();
+      init();
+    } catch { showLock('That code did not work. Try again.'); }
+  });
+
+  async function init() {
+    try {
+      const info = await api('/api/check');
+      assistantName = info.name || assistantName;
+      $('#name').textContent = assistantName;
+      document.title = assistantName;
+    } catch { /* lock dialog handles it */ }
+  }
+
+  // ---------- handling a reply ----------
+  function handleResult(data) {
+    if (data.transcript && data.source === 'voice') addMsg('user', data.transcript);
+    addMsg('bot', data.reply);
+    (data.actions || []).forEach(runAction);
+    playReply(data);
+  }
+
+  function runAction(a) {
+    if (a.type === 'timer') startTimer(a.seconds, a.label);
+    else if (a.type === 'light') addMsg('note', `${a.room} light: ${a.state}`);
+    else if (a.type === 'door') addMsg('note', `Front door: ${a.state}`);
+  }
+
+  function playReply(data) {
+    stopSpeaking();
+
+    if (data.audio_b64) {
+      const audio = new Audio(`data:${data.audio_mime || 'audio/wav'};base64,${data.audio_b64}`);
+      S.audio = audio;
+
+      audio.onended = () => {
+        S.audio = null;
+        S.busy = false;
+        idle();
+
+        if (S.continuous) {
+          setTimeout(() => {
+            if (S.continuous && !S.recording && !S.busy) startRecording();
+          }, 250);
+        }
+      };
+
+      audio.onerror = () => {
+        S.audio = null;
+        S.busy = false;
+        setMode('idle', 'Server voice playback failed.');
+
+        if (S.continuous) {
+          setTimeout(() => {
+            if (S.continuous && !S.recording && !S.busy) startRecording();
+          }, 500);
+        }
+      };
+
+      setMode('speaking', 'Speaking...');
+      audio.play().catch(() => {
+        S.audio = null;
+        S.busy = false;
+        setMode('idle', 'Could not play server voice.');
+
+        if (S.continuous) {
+          setTimeout(() => {
+            if (S.continuous && !S.recording && !S.busy) startRecording();
+          }, 500);
+        }
+      });
+    } else {
+      S.busy = false;
+      setMode('idle', 'Server voice unavailable.');
+
+      if (S.continuous) {
+        setTimeout(() => {
+          if (S.continuous && !S.recording && !S.busy) startRecording();
+        }, 500);
+      }
+    }
+  }
+
+  function browserSpeak(text) {
+    if (!('speechSynthesis' in window) || !text) { idle(); return; }
+    const u = new SpeechSynthesisUtterance(text);
+    u.onend = idle; u.onerror = idle;
+    setMode('speaking', 'Speaking. Tap to stop.');
+    speechSynthesis.speak(u);
+  }
+
+  function stopSpeaking() {
+    if (S.audio) { S.audio.onended = null; S.audio.pause(); S.audio = null; }
+    if ('speechSynthesis' in window) speechSynthesis.cancel();
+  }
+
+  // ---------- timers (browser tab khula rehna chahiye) ----------
+  function fmt(s) { const m = Math.floor(s / 60); return `${m}:${String(s % 60).padStart(2, '0')}`; }
+  function startTimer(seconds, label) {
+    const chip = document.createElement('span');
+    chip.className = 'timer';
+    timersEl.appendChild(chip);
+    const end = Date.now() + seconds * 1000;
+    const tick = setInterval(() => {
+      const left = Math.max(0, Math.round((end - Date.now()) / 1000));
+      chip.textContent = `${label} ${fmt(left)}`;
+      if (left === 0) {
+        clearInterval(tick);
+        chip.remove();
+        addMsg('note', `Timer finished: ${label}`);
+        beep();
+        if ('speechSynthesis' in window) speechSynthesis.speak(new SpeechSynthesisUtterance(`Your ${label} timer is done.`));
+      }
+    }, 250);
+  }
+  function beep() {
+    try {
+      const c = new (window.AudioContext || window.webkitAudioContext)();
+      const o = c.createOscillator(), g = c.createGain();
+      o.connect(g); g.connect(c.destination);
+      o.frequency.value = 880; g.gain.value = 0.15;
+      o.start(); o.stop(c.currentTime + 0.4);
+      setTimeout(() => c.close(), 700);
+    } catch { /* ignore */ }
+  }
+
+  // ---------- microphone ----------
+  function pickMime() {
+    const list = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus'];
+    return list.find((m) => window.MediaRecorder && MediaRecorder.isTypeSupported(m)) || '';
+  }
+
+  async function startRecording() {
+    if (!navigator.mediaDevices || !window.MediaRecorder) {
+      fail('This browser cannot record audio. Use the text box.'); return;
+    }
+    try {
+      S.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+    } catch { fail('Microphone is blocked. Allow it in your browser settings.'); return; }
+
+    const mime = pickMime();
+    S.chunks = []; S.heard = false;
+    S.rec = new MediaRecorder(S.stream, mime ? { mimeType: mime } : undefined);
+    S.rec.ondataavailable = (e) => { if (e.data.size) S.chunks.push(e.data); };
+    S.rec.onstop = onRecordingStopped;
+    S.rec.start();
+    S.recording = true;
+    setMode('listening', 'Listening. Stop talking and I will answer.');
+
+    // mic level (orb animation) + silence detection
+    S.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const src = S.ctx.createMediaStreamSource(S.stream);
+    S.analyser = S.ctx.createAnalyser();
+    S.analyser.fftSize = 1024;
+    src.connect(S.analyser);
+    const buf = new Float32Array(S.analyser.fftSize);
+    const startedAt = performance.now();
+    let lastVoice = startedAt;
+    const loop = () => {
+      S.analyser.getFloatTimeDomainData(buf);
+      let sum = 0; for (const v of buf) sum += v * v;
+      const rms = Math.sqrt(sum / buf.length);
+      orb.style.setProperty('--level', Math.min(1, rms * 6).toFixed(3));
+      const now = performance.now();
+      if (rms > 0.02) { S.heard = true; lastVoice = now; }
+      if ((S.heard && now - lastVoice > 1400) || now - startedAt > 30000) { stopRecording(); return; }
+      S.raf = requestAnimationFrame(loop);
+    };
+    loop();
+  }
+
+  function stopRecording() {
+    cancelAnimationFrame(S.raf);
+    if (S.rec && S.rec.state !== 'inactive') S.rec.stop();
+    if (S.stream) S.stream.getTracks().forEach((t) => t.stop());
+    if (S.ctx) S.ctx.close().catch(() => {});
+    S.recording = false;
+    orb.style.setProperty('--level', 0);
+  }
+
+  async function onRecordingStopped() {
+    const type = (S.rec && S.rec.mimeType) || 'audio/webm';
+    const blob = new Blob(S.chunks, { type });
+    if (!S.heard || blob.size < 1500) { idle(); setMode('idle', 'I did not hear anything. Tap and try again.'); return; }
+    S.busy = true;
+    setMode('thinking', 'Thinking...');
+    const form = new FormData();
+    form.append('audio', blob, 'speech.' + (type.includes('mp4') ? 'mp4' : type.includes('ogg') ? 'ogg' : 'webm'));
+    form.append('session_id', sessionId);
+    try {
+      const data = await api('/api/voice', { method: 'POST', body: form });
+      if (!data.transcript) { idle(); setMode('idle', 'Could not make out the words. Try again.'); return; }
+      handleResult({ ...data, source: 'voice' });
+    } catch (err) { fail(err.message); }
+  }
+
+  orb.addEventListener('click', () => {
+    if (S.recording) {
+      S.continuous = false;
+      stopRecording();
+      return;
+    }
+
+    if (document.body.dataset.mode === 'speaking') {
+      S.continuous = false;
+      stopSpeaking();
+      S.busy = false;
+      idle();
+      return;
+    }
+
+    if (S.busy) return;
+
+    S.continuous = true;
+    startRecording();
+  });
+
+  // ---------- text chat ----------
+  $('#textForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const input = $('#textInput');
+    const text = input.value.trim();
+    if (!text || S.busy || S.recording) return;
+    input.value = '';
+    addMsg('user', text);
+    S.busy = true;
+    setMode('thinking', 'Thinking...');
+    try {
+      const data = await api('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, session_id: sessionId }),
+      });
+      handleResult({ ...data, source: 'text' });
+    } catch (err) { fail(err.message); }
+  });
+
+  $('#reset').addEventListener('click', async () => {
+    stopSpeaking();
+    try { await api('/api/reset', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: '-', session_id: sessionId }) }); } catch { /* ignore */ }
+    logEl.textContent = '';
+    idle();
+  });
+
+  init();
+})();
+</script>
+</body>
+</html>
